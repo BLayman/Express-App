@@ -1,6 +1,7 @@
 
 var app = require('./app');
-app.listen(3000, function(){
-console.log('listening on port 3000');
+
+app.listen(process.env.PORT || 8080, process.env.IP || "0.0.0.0", function(){
+  console.log("listening on port 8080");
 });
 

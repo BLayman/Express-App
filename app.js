@@ -1,8 +1,11 @@
 var express = require("express");
 var app = express();
-app.get('/',function(req,res){
 
-res.send("OK\n");
+app.use(express.static("public"));
+
+app.get('/residents',function(req,res){
+var residents = ["Brett","Cassie","Gracie"]
+res.json(residents);
 });
 
 module.exports = app;

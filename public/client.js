@@ -8,13 +8,18 @@ $('form').on('submit',function(event){
   event.preventDefault();
   var form = $(this);
   var blockData = form.serialize();
+  $('.alert').hide();
 //post new name to server
   $.ajax({
   type: 'POST', url: '/blocks', data: blockData
-}).done(function(blockName){
+})
+.error(function(){
+  $('.alert').show();
+  })
+.done(function(blockName){
   appendToList([blockName]);
   form.trigger('reset');
-})
+});
 });
 
 //add html function

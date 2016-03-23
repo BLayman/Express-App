@@ -1,5 +1,9 @@
 var test = require('supertest');
 var app = require("./app");
+var redis = require("redis");
+var client = redis.createClient();
+client.select("test".length);
+client.flushdb();
 
 describe("requests to the root path", function(){
     it('returns a 200 status code', function(done){
@@ -42,17 +46,18 @@ describe("Listing on /residents", function() {
         .expect("Content-Type",/json/,done);
     });
     
-    it("returns residents", function(done) {
+    it("returns residents array", function(done) {
         test(app)
         .get('/residents')
-        .expect(JSON.stringify(["Brett","Cassie","Gracie"]),done);
+        .expect(JSON.stringify([]),done);
     });
     
 
 
 });
 
-describe("Listing on /blocks", function() {
+describe("Posting on /blocks", function() {
+   
     
      it("returns 201 status code", function(done) {
         test(app)
@@ -60,7 +65,7 @@ describe("Listing on /blocks", function() {
         .send("name=tracie&description=Gracies+cousin.")
         .expect(201,done);
      });
-   
+    
    it("Returns block data", function(done){
       test(app)
     .post('/blocks')
@@ -68,6 +73,23 @@ describe("Listing on /blocks", function() {
     .expect(/Tracie/,done); 
    }); 
     
-    
 });
-   
+
+describe("Deleting blocks", function() {
+    
+    before(function(){
+        client.hset('residents','stacie','Gracies other cousin');
+    });
+    
+    after(function(){
+        client.flushdb();
+    });
+    
+     it("returns 204 status code", function(done) {
+         
+        test(app)
+        .delete('/blocks/Tracie')
+        .expect(204,done);
+     });
+});
+ 

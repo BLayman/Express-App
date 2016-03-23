@@ -3,12 +3,14 @@ $(document).ready(function(){
 //get initial residents
 $.get('/residents', appendToList);
 
+  
 //add new block jquery
 $('form').on('submit',function(event){
   event.preventDefault();
+    $('.alert').hide();
   var form = $(this);
   var blockData = form.serialize();
-  $('.alert').hide();
+
 //post new name to server
   $.ajax({
   type: 'POST', url: '/blocks', data: blockData
@@ -16,7 +18,7 @@ $('form').on('submit',function(event){
 .error(function(){
   $('.alert').show();
   })
-.done(function(blockName){
+.success(function(blockName){
   appendToList([blockName]);
   form.trigger('reset');
 });
@@ -28,8 +30,8 @@ var list = [];
 var content, block;
 for(var i in blocks){
 block = blocks[i];
-content = '<a href="/blocks/' +block+'">'+block+'</a>' +
-'<a href="#" data-block="'+block+'"></a>';
+content = '<a href="#" data-block="'+block+'"><img src="delete.png" width="15px"></a>'+'<a href="/blocks/' +block+'">'+block+'</a>'
+;
 list.push($('<li>', { html: content }));
 }
 

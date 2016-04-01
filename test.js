@@ -2,7 +2,6 @@ var test = require('supertest');
 var app = require("./app");
 var redis = require("redis");
 var client = redis.createClient();
-client.select("test".length);
 client.flushdb();
 
 describe("requests to the root path", function(){
@@ -33,22 +32,22 @@ describe("requests to the root path", function(){
    
 });
 
-describe("Listing on /residents", function() {
+describe("Listing on /blocks", function() {
     it("returns 200 status code", function(done) {
         test(app)
-        .get('/residents')
+        .get('/blocks')
         .expect(200,done);
     });
     
      it("returns JSON", function(done) {
         test(app)
-        .get('/residents')
+        .get('/blocks')
         .expect("Content-Type",/json/,done);
     });
     
     it("returns residents array", function(done) {
         test(app)
-        .get('/residents')
+        .get('/blocks')
         .expect(JSON.stringify([]),done);
     });
     
@@ -72,6 +71,13 @@ describe("Posting on /blocks", function() {
     .send("name=Tracie&description=Gracies+cousin.")
     .expect(/Tracie/,done); 
    }); 
+   
+      it("Validates name and description", function(done){
+      test(app)
+    .post('/blocks')
+    .send("name=&description=")
+    .expect(400,done); 
+   }); 
     
 });
 
@@ -88,8 +94,37 @@ describe("Deleting blocks", function() {
      it("returns 204 status code", function(done) {
          
         test(app)
-        .delete('/blocks/Tracie')
+        .delete('/blocks/stacie')
         .expect(204,done);
      });
 });
+
+describe("Show resident description", function() {
+   
+        before(function(){
+        client.hset('residents','stacie','Gracies other cousin');
+    });
+    
+    after(function(){
+        client.flushdb();
+    });
+    
+     it("returns 200 status code", function(done) {
+        test(app)
+        .get('/blocks/stacie')
+        .expect(200,done);
+     });
+     
+       it("Returns html format", function(done){
+        test(app)
+        .get('/blocks/stacie')
+        .expect("Content-Type",/html/,done);
+    });
+    
+       it("Returns resident info", function(done){
+        test(app)
+        .get('/blocks/stacie')
+        .expect(/cousin/,done);
+    });
+}); 
  
